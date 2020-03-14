@@ -4,8 +4,6 @@
   class GoogleSearch {
     public $table = 'gp_search';
     public $text = '';
-    public $result = [];
-    public $lastInsertId = null;
 
     public function __construct() {
       $this->conn = DB::getConnection();

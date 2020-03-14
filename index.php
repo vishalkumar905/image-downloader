@@ -4,9 +4,9 @@
   
   $Input = new Input();
   $GooglePhotos = new GooglePhotos();
-  $GooglePhotos->init();
-?>
+  $getAllResult = $GooglePhotos->init();
 
+?>
 <!DOCTYPE html>
   <html>
     <head>
@@ -27,31 +27,16 @@
               <div class="input-group">
                 <input type="text" name='search' value='<?=$Input->post('search');?>' class="form-control" placeholder="Search">
                 <div class="input-group-btn">
-                  <button  class="btn btn-default" value='Search'  type="submit">Search</button>
+                  <button class="btn btn-default" value='Search'  type="submit">Search</button>
                 </div>
               </div>
-
             </form>
           </div>
 
           <div class='result'>
-            <?php
-              $message = '';
-              if (!empty($Input->post('search'))) {
-                $message .= 'Result: ';
-                if (empty($GooglePhotos->result)) {
-                  $message .= '<b>Not found </b>';
-                } else if (!empty($GooglePhotos->result)) {
-                  $message .= '<b>'.count($GooglePhotos->result).' pictures found</b>';
-                }
-              }
-            ?>
-            <br><p><?=$message?></p>
-            <?php if (!empty($GooglePhotos->result)) { 
-              foreach($GooglePhotos->result as $row) {  
-            ?>
-              <img class="img-thumbnail" src='images/<?=$row['image']?>'/>
-            <?php } }?>
+            <?=$GooglePhotos->getResultMessage($Input->post('search'), $getAllResult)?>
+            
+            <?=$GooglePhotos->showResults($getAllResult)?>
           </div>
         </div>
       </div>

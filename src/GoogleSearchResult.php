@@ -3,7 +3,6 @@
 
   class GoogleSearchResult {
     public $table = 'gp_results';
-    public $result = [];
     public $search_id = '';
     public $image = '';
 

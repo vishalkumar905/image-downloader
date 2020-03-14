@@ -3,7 +3,6 @@
   require_once dirname(__DIR__).'/src/GoogleSearchResult.php';
   
   class GooglePhotos {
-    public $result = []; 
 
     public function __construct() {
       $this->input = new Input();
@@ -38,6 +37,32 @@
       }
 
       return $returnArr;
+    }
+
+    public function showResults($data) {
+      $htmlResults = '';
+      if (!empty($data)) { 
+        foreach($data as $row) {  
+          $htmlResults .= '<img class="img-thumbnail" src="images/'.$row['image'].'"/>';
+        }
+      }
+
+      return $htmlResults;
+    }
+
+    public function getResultMessage($search, $result) {
+      $message = '';
+      if (!empty($search)) {
+        $message .= '<p>Result: ';
+        if (empty($result)) {
+          $message .= '<b>Not found </b>';
+        } else if (!empty($result)) {
+          $message .= '<b>'.count($result).' pictures found</b>';
+        }
+        $message .= '</p>';
+      }
+      
+      return $message;
     }
 
     private function getResult($search) {
