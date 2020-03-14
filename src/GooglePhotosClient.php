@@ -11,34 +11,36 @@
 
     public function init() {
       $search = trim($this->input->post('search'));
+      $returnArr = [];
 
       if ($search) {
 
         $GoogleSearch = new GoogleSearch();
-        $GoogleSearch->find($search);
-
-        if(empty($GoogleSearch->result)) {
-          $GoogleSearch->add($search);
-          $this->result = $this->getResult($search);
-        }
-
         $GoogleSearchResult = new GoogleSearchResult();
-        if (!empty($GoogleSearch->result)) {
-          $GoogleSearchResult->findBySearchId($GoogleSearch->result[0]['id']);
-          $this->result = $GoogleSearchResult->result;
-        }
 
-        if ($GoogleSearch->lastInsertId) {
-          foreach ($this->result as $row) {
-            $GoogleSearchResult->image = $row['image'];
-            $GoogleSearchResult->search_id = $GoogleSearch->lastInsertId;
-            $GoogleSearchResult->add();
+        $getSearchData = $GoogleSearch->find($search);
+
+        if(empty($getSearchData)) {
+          $lastInsertId = $GoogleSearch->add($search);
+          $returnArr = $this->getResult($search);
+
+          if ($lastInsertId > 0) {
+            foreach ($returnArr as $row) {
+              $GoogleSearchResult->image = $row['image'];
+              $GoogleSearchResult->search_id = $lastInsertId;
+              $GoogleSearchResult->add();
+            }
           }
-        }        
+        } else {
+          $getSearchResultData = $GoogleSearchResult->findBySearchId($getSearchData[0]['id']);
+          $returnArr = $getSearchResultData;
+        } 
       }
+
+      return $returnArr;
     }
 
-    public function getResult($search) {
+    private function getResult($search) {
       
       $htmlOutput = $this->getHtmlOutput($search);
       $parsedOutput = $this->parseOutput($htmlOutput);
@@ -86,10 +88,10 @@
     private function getHtmlOutput($search) {
       $search = urlencode($search);
       $url = "https://www.google.com/search?q=".$search."&tbm=isch";
-      return $this->file_get_content_curl($url);
+      return $this->getContentThroughCurl($url);
     }
 
-    private function file_get_content_curl($url) {
+    private function getContentThroughCurl($url) {
       $ch = curl_init();
       curl_setopt ($ch, CURLOPT_URL, $url);
       curl_setopt ($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)');
